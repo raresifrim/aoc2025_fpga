@@ -1,8 +1,8 @@
-`include "day1.sv" //needed for iverilog
+//`include "day1.sv" //needed for iverilog
 
-module day1_puzzle1_tb();
+module day1_puzzle_tb();
 
-    localparam int PUZZLE = 1;
+    localparam int PUZZLE = 2;
     localparam int WIDTH = 16;
 
     logic clock = 1'b0;
@@ -15,7 +15,7 @@ module day1_puzzle1_tb();
     reg[63:0] line; //compatible with both vivado and iverilog
     byte direction;
 
-    day1_puzzle1 #(.WIDTH(WIDTH), .PUZZLE(PUZZLE)) dut(.*);
+    day1_puzzle #(.WIDTH(WIDTH), .PUZZLE(PUZZLE)) dut(.*);
 
     always #5 clock = ~clock;
 

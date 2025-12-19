@@ -1,16 +1,16 @@
-module day1_puzzle1#(
+module day1_puzzle#(
     parameter WIDTH=16,
     parameter PUZZLE = 1
     )(
-    input wire clock,
-    input wire reset,
-    input wire init,
-    input wire valid,
-    input wire rotation, //1-right,0-left
-    input wire [WIDTH-1:0] rotate_amount,
-    input wire [WIDTH-1:0] max_number,
-    output wire ready, ///ready to receive a (new) input
-    output wire [WIDTH-1:0] password
+        input logic clock,
+        input logic reset,
+        input logic init,
+        input logic valid,
+        input logic rotation, //1-right,0-left
+        input logic [WIDTH-1:0] rotate_amount,
+        input logic [WIDTH-1:0] max_number,
+        output logic ready, ///ready to receive a (new) input
+        output logic [WIDTH-1:0] password
     );
 
     logic [WIDTH-1:0] number_ff;
