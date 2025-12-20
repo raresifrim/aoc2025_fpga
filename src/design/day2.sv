@@ -81,6 +81,7 @@ module msb_digit #(
             non_zero[i] = |digits[i];
 
     always_comb begin//get the most significant digit based on a priority encoder
+        msb_digit = '0;
         for (int i = (W+(W-4)/3)/4 - 1; i >= 0; i--) begin
             if(non_zero[i]) begin
                 msb_digit = i + 1'b1; //don't index from zero
@@ -108,13 +109,37 @@ module id_checker #(
     end
 
     else if (PUZZLE == 2) begin
-        localparam int MAX_DIGITS = (W+(W-4)/3)/4;
-        localparam int HALF_MAX_DIGITS = (W+(W-4)/3)/8;
+        localparam bit [3:0] MAX_DIGITS = (W+(W-4)/3)/4; //15 digits are enough for 48-bits
+        localparam bit [2:0] HALF_MAX_DIGITS = (W+(W-4)/3)/8;
         //this is an ideal combinational case where we comapre all possible repeatitions in parallel at once in once clock cycle
         //for better timing we coulg split this in a pipeline as well for each repetition
         //we have MAX_DIGITS maximum number of digits in BCD as (W+(W-4)/3)/4 where is W is the width in number of bits of our numbers
         //we have HALF_MAX_DIGITS which is the half of the above amount as best case we only have two halves that are equal => invalid id
         //we will have HALF_MAX_DIGITS repeaters that repeats each BCD digit as needed, afterwards we check if the resulted number is equal to our initial number
+
+        //generate a look-up table to avoid the modulo operator
+        typedef bit LUT_t [0:2**7 - 1]; //enough for our 48-bit inputs or 15-digit numbers
+        function automatic LUT_t LUT_init();
+            LUT_t data = '{default: 0};
+            for(bit[7:0] i = '0; i<(2**7); i++) begin
+                bit[3:0] msb = i[3:0];
+                bit[3:0] idx = i[6:4] + 1'b1;
+                bit val = ~|(msb % idx);
+                data[i] = val;
+            end
+            return data;
+        endfunction
+
+        (* ram_style = "block" *) LUT_t Mask_Array = LUT_init;
+
+        //we use the repeater operator to repeat each possible sequnce of a BCD (up to the half) until we fill an entire number
+        //we compare then the obtained number with our original BCD and check if they are equal
+        //if so, the it means our original BCD is composed for a sequence of repeating digits
+        //as we don't know before hand how large our input BCD is, we fill an entire [W+(W-4)/3:0] number, but this will not be exactly our BCD
+        //so we create masks depending on the repeating step in order to obatin a sequence of repeating digits equal in size with our BCD
+        // as a number like 5.2175.2175 will generate for the sequence 2175 the number 2175.2175.2175.2175 which truncated will result in to 5.2175.2175 which is a false postive
+        //so as second check, we only check sequences that fill in perfectly the size of our BCD based on the detected most significant digit
+        //and it is why we generate the lookup table above in order to avoid the modulo operator
 
         logic [(W+(W-4)/3)/4:0][3:0] digits; //split into digits
         assign digits = bcd;
@@ -126,16 +151,14 @@ module id_checker #(
 
         genvar i;
         assign sequences[0] = {MAX_DIGITS{digits[0]}};
-        for (i=1; i<HALF_MAX_DIGITS; i++) begin 
-            assign sequences[i] = msb_digit % (i+1) == 0 ? {'0,{(HALF_MAX_DIGITS-i+1){digits[i:0]}}} : '0;
-        end
+        for (i=1; i<HALF_MAX_DIGITS; i++) 
+            assign sequences[i] = Mask_Array[{i, msb_digit[3:0]}] ? {'0,{(HALF_MAX_DIGITS-i+1){digits[i:0]}}} : '0;
         for(i=0; i<HALF_MAX_DIGITS; i++)
             assign is_invalid[i] = (sequences[i] & mask) == bcd;
 
         logic [HALF_MAX_DIGITS-1:0] flag_mask;
         assign flag_mask = ~(HALF_MAX_DIGITS'('1) << (msb_digit >> 1));
         assign invalid_id = |(is_invalid & flag_mask);
-
     end
     endgenerate
 
@@ -220,7 +243,7 @@ module id_finder #(
 endmodule
 
 
-(* use_dsp48 = "yes" *)
+(* use_dsp = "yes" *)
 module adder_cascade#(
     parameter W = 48 //force it into DSP if we can
     )(
@@ -251,9 +274,6 @@ module id_gatherer #(
     generate
         localparam ADDER_WIDTH = W > 48 ? W : 48;
         localparam DSP_UNITS = (NUM_UNITS / 2) + (NUM_UNITS % 2);
-        initial begin
-            $display("Total DSP Units: %d", DSP_UNITS);
-        end
         if (DSP_UNITS == 1)
             adder_cascade #(ADDER_WIDTH) adder_cascade_inst(
                 .clock(clock),
@@ -306,7 +326,7 @@ endmodule
 module day2_puzzle#(
     parameter W = 48,
     parameter NUM_UNITS = 8,
-    parameter PUZZLE = 1
+    parameter PUZZLE = 2
     )(
         input logic clock, reset, en, load,
         input logic [W-1:0] start_id [0:NUM_UNITS-1],
