@@ -1,0 +1,3 @@
+../../src/sim/day3_tb.sv:48: error: Method getc is not a string method.
+../../src/sim/day3_tb.sv:48: error: Object day3_puzzle_tb.line[i] has no method "getc(...)".
+1 error(s) during elaboration.
