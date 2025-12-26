@@ -47,7 +47,7 @@ module day2_puzzle_tb();
         //test from file
         while (!$feof(fd)) begin
             $fgets (line, fd);
-           $sscanf(line, "%d-%d", a, b);
+            $sscanf(line, "%d:%d", a, b); //had to modify the range separator to work in verilator
             start_id[range_idx] = a;
             end_id[range_idx] = b;
             $display("%d -> %d", start_id[range_idx], end_id[range_idx]);

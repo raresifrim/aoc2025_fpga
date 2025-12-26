@@ -130,7 +130,7 @@ module id_checker #(
             return data;
         endfunction
 
-        (* ram_style = "block" *) LUT_t Mask_Array = LUT_init;
+        (* ram_style = "block" *) LUT_t Mask_Array = LUT_init();
 
         //we use the repeater operator to repeat each possible sequnce of a BCD (up to the half) until we fill an entire number
         //we compare then the obtained number with our original BCD and check if they are equal
