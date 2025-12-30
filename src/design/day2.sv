@@ -1,70 +1,3 @@
-module bin2bcd #(
-    parameter W = 32 // input width
-    )(
-        input logic [W-1:0] bin,  // binary
-        output logic [W+(W-4)/3:0] bcd
-    ); // bcd {...,thousands,hundreds,tens,ones}
-
-  //can scale on any type of input compared with a look-up table,
-  //but maybe will need to split it in multiple pipeline to account for better latency
-  always_comb begin
-    for(int i = 0; i <= W+(W-4)/3; i++) bcd[i] = 0;     // initialize with zeros
-    bcd[W-1:0] = bin;                                   // initialize with input vector
-    for(int i = 0; i <= W-4; i++)                       // iterate on structure depth
-      for(int j = 0; j <= i/3; j++)                     // iterate on structure width
-        if (bcd[W-i+4*j -: 4] > 4)                      // if > 4
-          bcd[W-i+4*j -: 4] = bcd[W-i+4*j -: 4] + 4'd3; // add 3
-  end
-
-endmodule
-
-module bcd2bin #(
-    parameter W = 32 // input width
-    )(
-        input logic [W+(W-4)/3:0] bcd,
-        output logic [W-1:0] bin
-    ); 
-
-    logic [(W+(W-4)/3)/4:0][3:0] digits; //split into digits
-
-   always_comb begin
-        bin = '0;
-        digits = bcd;
-        for (int i=0; i < W; i++) begin
-            bin = {digits[0][0],bin[W-1:1]};
-            digits >>= 1;
-            for (int j=0; j<(W+(W-4)/3)/4; j++)
-                if(digits[j][3] == 1'b1) //we have a number >= 8
-                    digits[j] -= 4'd3;
-        end
-   end
-
-endmodule
-
-module counter #(
-    parameter W = 32 // input width
-    )(
-        input logic clock, reset,
-        input logic load, cnt_up,
-        input logic [W-1:0] cnt_in,
-        output logic [W-1:0] cnt_out
-    );
-
-    var logic [W-1:0] cnt_ff = '0;
-    assign cnt_out = cnt_ff;
-
-    always_ff@(posedge clock) begin
-        if (reset)
-            cnt_ff <= '0;
-        else if(load)
-            cnt_ff <= cnt_in;
-        else if(cnt_up)
-            cnt_ff <= cnt_ff + 1'b1;
-    end
-
-endmodule
-
-
 module msb_digit #(
     parameter W = 32 // input width
     )(
@@ -164,25 +97,6 @@ module id_checker #(
 
 endmodule
 
-module accumulator #(
-    parameter W=32
-    )(
-        input logic clock, reset, acc_en,
-        input logic [W-1:0] next_input,
-        output logic [W-1:0] current
-    );
-    logic [W-1:0] acc_reg = '0;
-    assign current = acc_reg;
-
-    always_ff@(posedge clock) begin
-        if (reset)
-            acc_reg <= '0;
-        else if (acc_en)
-            acc_reg <= acc_reg + next_input;
-    end
-
-endmodule
-
 module id_finder #(
     parameter W = 32, // input width
     parameter PUZZLE = 1
@@ -242,21 +156,6 @@ module id_finder #(
     assign done = (en & ~in_range_s5 & ~in_range_s1);
 endmodule
 
-
-(* use_dsp = "yes" *)
-module adder_cascade#(
-    parameter W = 48 //force it into DSP if we can
-    )(
-        input logic clock,
-        input logic signed [W-1:0] a,
-        input logic signed [W-1:0] b,
-        input logic signed [W-1:0] pcin,
-        output logic signed [W-1:0] pcout
-);
-
-   always_ff@(posedge clock)
-    pcout <= a + b + pcin;
-endmodule
 
 //used for at least 2 parallel units
 module id_gatherer #(
