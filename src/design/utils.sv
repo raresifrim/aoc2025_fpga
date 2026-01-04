@@ -266,3 +266,31 @@ module adder_tree#(
     endgenerate
 
 endmodule
+
+(* use_dsp = "yes" *)
+module mult24x24 (input logic clock,
+                  input logic signed [23:0] A,
+                  input logic signed[23:0] B,
+                  output logic signed [47:0] P);
+   
+   logic signed [47:0] PL [2:0];
+   logic signed [23:0] RA;
+   logic signed [23:0] RB;
+   
+   //behaviour of two cascaded DSPs that produce a 24x24 multiplication
+   //here we can infer the DSPs instead of instantiating them as Vivado understands what we want and produces the desired circuit
+   //this produces an output in 4 cycles at max DSP frequency
+   always_ff@(posedge clock) begin
+    //first pipeline level
+        RA<=A;
+        RB<=B;
+    //second pipeline level
+        PL[0]<=RA*RB;
+    //the rest of pipeline levels
+        PL[1] <= PL[0];
+        PL[2] <= PL[1];
+   end
+
+   assign P = PL[2];
+
+endmodule
