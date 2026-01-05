@@ -1,4 +1,4 @@
-module day5_puzzle_tb();
+module day5_puzzle1_tb();
 
     localparam int WIDTH = 64;
     localparam int DEPTH = 183;
@@ -11,7 +11,7 @@ module day5_puzzle_tb();
     logic [WIDTH-1:0] id;
     logic [31:0] total_fresh;
 
-    day5_puzzle#(.DEPTH(DEPTH),.WIDTH(WIDTH)) day5_puzzle_dut(.*);
+    day5_puzzle1#(.DEPTH(DEPTH),.WIDTH(WIDTH)) day5_puzzle_dut(.*);
 
     int fd;
     string line;
@@ -22,7 +22,7 @@ module day5_puzzle_tb();
 
     initial begin
         $dumpfile("dump.vcd");
-        $dumpvars(0, day9_puzzle1_tb);
+        $dumpvars(0, day5_puzzle1_tb);
         forever begin
             #(CLK_PERIOD/2) clock = ~clock;
         end

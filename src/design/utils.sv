@@ -105,6 +105,7 @@ endmodule
 // Copyright (c) 2019-2022 Frédéric REQUIN
 // License : BSD
 // Imported it in order to simulate the CARRY8 primitive in verilator/iverilog
+// Comment it when using Vivado
 
 /* verilator coverage_off */
 module CARRY8

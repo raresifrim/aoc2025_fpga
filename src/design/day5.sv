@@ -1,4 +1,4 @@
-module processing_element#(
+module processing_element1#(
     parameter WIDTH=64
     )(
         input logic clock,
@@ -43,7 +43,7 @@ module processing_element#(
 
 endmodule
 
-module day5_puzzle#(
+module day5_puzzle1#(
     parameter WIDTH=64,
     parameter DEPTH=183
     )(
@@ -66,7 +66,7 @@ module day5_puzzle#(
 
         genvar i;
         for(i=0;i<DEPTH;i++) begin
-            processing_element#(.WIDTH(WIDTH)) processing_element_inst(
+            processing_element1#(.WIDTH(WIDTH)) processing_element_inst(
                 .clock(clock),
                 .reset(reset),
                 .we(load_ranges),
