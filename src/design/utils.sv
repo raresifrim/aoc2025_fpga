@@ -295,3 +295,26 @@ module mult24x24 (input logic clock,
    assign P = PL[2];
 
 endmodule
+
+// Simple Dual-Port Block RAM with Two Clocks
+module dp_dc_ram#(
+    parameter WIDTH=64,
+    parameter DEPTH=512
+    )(
+        input logic clka, clkb, we,
+        input logic[$clog2(DEPTH)-1:0] addra, addrb,
+        input logic [WIDTH-1:0] dia,
+        output logic [WIDTH-1:0] dob
+        );
+
+    (*ram_style="block"*) logic [WIDTH-1:0] ram [DEPTH];
+
+    always_ff@(posedge clka)begin
+        if (we)
+            ram[addra] <= dia;
+    end
+
+    always_ff@(posedge clkb) begin
+        dob <= ram[addrb];
+    end
+endmodule
