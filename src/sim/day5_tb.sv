@@ -85,7 +85,7 @@ module day5_puzzle2_tb();
     localparam int WIDTH = 64;
     localparam int DEPTH = 256;
     localparam int CLK_PERIOD = 10;
-    localparam int TOTAL_RANGES = 183;
+    localparam int TOTAL_RANGES = 5;
 
     logic clock = '0, reset = '1, load_ranges='0, start_transfer='0;
     logic valid, stop;
@@ -102,7 +102,7 @@ module day5_puzzle2_tb();
 
     initial begin
         $dumpfile("dump.vcd");
-        $dumpvars(0, day5_puzzle1_tb);
+        $dumpvars(0, day5_puzzle2_tb);
         forever begin
             #(CLK_PERIOD/2) clock = ~clock;
         end
@@ -111,8 +111,8 @@ module day5_puzzle2_tb();
     //read ranges and ids
     initial begin
         // Open the file in read mode
-        fd = $fopen("../../inputs/day5_puzzle1_in.txt", "r");
-        //fd = $fopen("../../inputs/day5_test.txt", "r");
+        //fd = $fopen("../../inputs/day5_puzzle1_in.txt", "r");
+        fd = $fopen("../../inputs/day5_test.txt", "r");
         if (fd == 0) begin
             $display("Error: input.txt file handle was NULL. Check file path.");
             $finish;

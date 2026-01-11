@@ -57,6 +57,7 @@ module processing_element2#(
     logic [WIDTH-1:0] start_reg, end_reg;
     logic [DEPTH-1:0] valid_ranges = '0;
 
+    logic [$clog2(DEPTH)-1:0] last_address, max_address;
     logic cnt_load, cnt_up;
     logic [$clog2(DEPTH)-1:0] cnt_in, cnt_out;
     logic done;
@@ -69,7 +70,6 @@ module processing_element2#(
     assign cnt_load = (last_address - 1'b1) == cnt_out;
     assign cnt_up = start & ~done;
 
-    logic [$clog2(DEPTH)-1:0] last_address, max_address;
     always_ff@(posedge clock) begin
         if(reset)
             last_address <= '0;
@@ -91,6 +91,8 @@ module processing_element2#(
     logic [WIDTH-1:0] start_mem_in, end_mem_in;
     logic [WIDTH-1:0] start_mem_out, end_mem_out;
     logic [$clog2(DEPTH)-1:0] mem_address_w, mem_address_r;
+    logic expand_range;
+    logic [WIDTH-1:0] start_extended, end_extended;
 
     dp_dc_ram #(.WIDTH(WIDTH),.DEPTH(DEPTH)) start_mem(
         .clka(clock), .clkb(~clock), .we(mem_write),
@@ -107,14 +109,13 @@ module processing_element2#(
         .dia(end_mem_in),
         .dob(end_mem_out)
         );
+
     assign start_mem_in = we ? start_range_in : start_extended;
     assign end_mem_in = we ? end_range_in : end_extended;
     assign mem_write = we | (expand_range & ~done);
     assign mem_address_w = we ? last_address : cnt_out;
     assign mem_address_r = done ? max_address : (cnt_load ? last_address - 1'b1 : cnt_out);
 
-    logic expand_range;
-    logic [WIDTH-1:0] start_extended, end_extended;
     assign expand_range = (start_mem_out <= start_reg && end_mem_out >= start_reg) |
                           (start_mem_out <= end_reg && end_mem_out >= end_reg);
     assign start_extended = (start_mem_out <= start_reg) ? start_mem_out : start_reg;
