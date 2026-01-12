@@ -85,7 +85,7 @@ module day5_puzzle2_tb();
     localparam int WIDTH = 64;
     localparam int DEPTH = 256;
     localparam int CLK_PERIOD = 10;
-    localparam int TOTAL_RANGES = 5;
+    localparam int TOTAL_RANGES = 183;
 
     logic clock = '0, reset = '1, load_ranges='0, start_transfer='0;
     logic valid, stop;
@@ -111,8 +111,8 @@ module day5_puzzle2_tb();
     //read ranges and ids
     initial begin
         // Open the file in read mode
-        //fd = $fopen("../../inputs/day5_puzzle1_in.txt", "r");
-        fd = $fopen("../../inputs/day5_test.txt", "r");
+        fd = $fopen("../../inputs/day5_puzzle1_in.txt", "r");
+        //fd = $fopen("../../inputs/day5_test.txt", "r");
         if (fd == 0) begin
             $display("Error: input.txt file handle was NULL. Check file path.");
             $finish;
@@ -147,7 +147,6 @@ module day5_puzzle2_tb();
         start_transfer='1;
         wait(stop == 1);
         #(CLK_PERIOD);
-        $display("Total fresh indredients:%d", total_fresh);
         for (int i=0;i<TOTAL_RANGES;i++) begin
           $display("Range @%d = [%d,%d] is valid(%d); Original Range [%d, %d]",
             i,
@@ -157,10 +156,8 @@ module day5_puzzle2_tb();
             start_ranges[i],
             end_ranges[i]
             );
-          if(day5_puzzle_dut.processing_element_inst.valid_ranges[i] == '1)
-            gold_value += (day5_puzzle_dut.processing_element_inst.end_mem.ram[i] - day5_puzzle_dut.processing_element_inst.start_mem.ram[i] + 1'b1);
         end
-        $display("Gold value = %d", gold_value);
+        $display("Total fresh indredients:%d", total_fresh);
         $finish;
     end
 endmodule

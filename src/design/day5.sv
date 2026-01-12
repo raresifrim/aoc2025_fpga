@@ -116,8 +116,10 @@ module processing_element2#(
     assign mem_address_w = we ? last_address : cnt_out;
     assign mem_address_r = done ? max_address : (cnt_load ? last_address - 1'b1 : cnt_out);
 
-    assign expand_range = (start_mem_out <= start_reg && end_mem_out >= start_reg) |
-                          (start_mem_out <= end_reg && end_mem_out >= end_reg);
+    assign expand_range = (start_mem_out <= start_reg & end_mem_out >= start_reg) |
+                          (start_mem_out <= end_reg & end_mem_out >= end_reg) |
+                          (start_reg <= start_mem_out & end_reg >= start_mem_out) |
+                          (start_reg <= end_mem_out & end_reg >= end_mem_out);
     assign start_extended = (start_mem_out <= start_reg) ? start_mem_out : start_reg;
     assign end_extended = (end_mem_out >= end_reg) ? end_mem_out : end_reg;
 
