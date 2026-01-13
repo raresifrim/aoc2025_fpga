@@ -61,7 +61,7 @@ module day2_puzzle_tb();
 
         wait(done == 1);
         #((DSP_UNITS+1)*CLK_PERIOD); //worst case wait for all DSPs to propagate their values
-       $display("Result is: %x", id_sum);
+       $display("Result is: %d", id_sum);
         $finish;
     end
 

@@ -29,7 +29,7 @@ module day9_puzzle1#(
             logic signed [W+1:0] right_low = (signed'({1'b0,x_coord}) - signed'({1'b0,right_low_corner_x})) + (signed'({1'b0,y_coord}) - signed'({1'b0,right_low_corner_y}));
             logic signed [W+1:0] left_up = (signed'({1'b0,left_up_corner_x}) - signed'({1'b0,x_coord})) + (signed'({1'b0,left_up_corner_y}) - signed'({1'b0,y_coord}));
             logic signed [W+1:0] left_low = (signed'({1'b0,left_low_corner_x}) - signed'({1'b0,x_coord})) + (signed'({1'b0,y_coord}) - signed'({1'b0,left_low_corner_y}));
-
+            //could split these subtraction and comparison into different pipeline stages if bettern timing is needed
             if (right_up > 0 && (x_coord >= right_up_corner_x || y_coord <= right_up_corner_x)) begin
                 right_up_corner_x <= x_coord;
                 right_up_corner_y <= y_coord;

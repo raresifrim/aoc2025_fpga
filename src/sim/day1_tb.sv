@@ -1,5 +1,3 @@
-//`include "day1.sv" //needed for iverilog
-
 module day1_puzzle_tb();
 
     localparam int PUZZLE = 2;
@@ -12,7 +10,7 @@ module day1_puzzle_tb();
     logic [WIDTH-1:0] rotate_amount, max_number, password;
 
     int fd, num;
-    reg[63:0] line; //compatible with both vivado and iverilog
+    string line;
     byte direction;
 
     day1_puzzle #(.WIDTH(WIDTH), .PUZZLE(PUZZLE)) dut(.*);
@@ -67,7 +65,7 @@ module day1_puzzle_tb();
                 rotate_amount = num;
                 rotation = (direction == "R");
                 valid = 1'b1;
-                //$display("Current rotation: %d, Current direction: %c", num, direction);
+                //$display("Current rotation: %d, Current direction: %d", num, rotation);
                 wait(clock==0);
                 //if (dut.number_ff == 0)
                     //$display("Accumulator equal to zero!");
@@ -79,8 +77,8 @@ module day1_puzzle_tb();
 
         wait(clock==1);
         valid = 1'b0;
-        #10
         $display("Finished reading file. Password is %d", password);
+        #10
         $finish;
     end
 
