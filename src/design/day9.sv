@@ -72,8 +72,8 @@ module day9_puzzle1#(
 
 
     logic [47:0] P1,P2;
-    mult24x24 mult_inst1 (.clock(clock), .A({'0,square1_w}), .B({'0,square1_h}),.P(P1));
-    mult24x24 mult_inst2 (.clock(clock), .A({'0,square2_w}), .B({'0,square2_h}),.P(P2));
+    mult24x24 mult_inst1 (.clock(clock), .A({0,square1_w}), .B({0,square1_h}),.P(P1));
+    mult24x24 mult_inst2 (.clock(clock), .A({0,square2_w}), .B({0,square2_h}),.P(P2));
     always_ff@(posedge clock) begin
         area <= P1 > P2 ? P1:P2;
     end
