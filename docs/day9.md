@@ -2,7 +2,7 @@
 
 The design for Day 9 (first part) is implemented in a pipeline fashion.
 
-The reasoning for finding the largest area is that, especially as we care about identifying rectangles by opposing corners, is that the furtherest opposite points will give us the largest area availbale.
+The reasoning for finding the largest area is that, especially as we care about identifying rectangles by opposing corners, is that the furtherest opposite points in the entire 2D plan will give us the largest area availbale.
 
 Of course there are four corners of a rectangle:
 - upper left
@@ -86,7 +86,9 @@ Afterwards, in the next pipeline stage, using two parallel multipliers implement
 
 In our final pipeline stage, we then compare the two areas and register the highest one.
 
-### Input/Output ports
+The initial pipeline stage contains the entire direction computation (two parallel subtractions followed by their sum) and the comparison. This is just for the purpose of the puzzle, but if we care about timing closure, we can split this stage in tree stages: subtraction, sum of subtractions and comparison. We just need to invest some more FFs in order to also propagate our coordinates up until the stage where we compute the rectangle sides.
+
+## Input/Output ports
 
 ```verilog
 input logic clock, reset,
@@ -95,7 +97,7 @@ input logic [W-1:0] y_coord,
 output logic [2*W-1:0] area
 ```
 
-### Parameters
+## Parameters
 
 ```verilog
 //should be enough for our puzzle inputs, and it also fits nicely into a DSP for multiplication

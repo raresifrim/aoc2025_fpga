@@ -39,6 +39,11 @@ For evaluation I will provide for each design the main FPGA primitives consumed 
 4. `src/sim`: SystemVerilog testbench files for all solved puzzles 
 5. `*.tcl + Makefile`: scripts that simulate/synth/implement the designs using Vivado mainly
 
+## Tools used for sim/synth
+
+- Verilator 5.041 devel rev v5.040-201-g21dbdbf69
+- Vivado v2025.1
+
 ## How to run
 
 The designs are mainly tested with the Vivado simulator. For iverilog, some modifications have to be made. Apart for the Day1 puzzle, all designs also provide the correct response under verilator as well. The Day1 puzzles work under Vivado, but not under Verilator, but I didn't had the time to check why.

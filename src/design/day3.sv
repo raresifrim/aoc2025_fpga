@@ -147,7 +147,6 @@ module day3_puzzle1#(
 
 endmodule
 
-
 module day3_puzzle2#(
     parameter NUM_UNITS = 200,
     parameter NUM_ACTIVE_BATTERIES=12,
@@ -164,6 +163,7 @@ module day3_puzzle2#(
         genvar i;
         logic [BCD_W-1:0] max_joltage_bcd [NUM_UNITS];
         logic [BIN_W-1:0] max_joltage_bin [NUM_UNITS];
+        logic [BIN_W-1:0] max_joltage_reg [NUM_UNITS];
         for (i=0;i<NUM_UNITS;i++) begin
             max_joltager_puzzle2 max_joltager_inst(
                 .clock(clock),
@@ -179,9 +179,13 @@ module day3_puzzle2#(
                 );
         end
 
+        always_ff@(posedge clock)
+            for(int j=0;j<NUM_UNITS;j++)
+                max_joltage_reg[j] <= max_joltage_bin[j];
+
         adder_tree #(.W(BIN_W), .NUM_INPUTS(NUM_UNITS)) adder_tree_inst(
             .clock(clock),
-            .inputs(max_joltage_bin),
+            .inputs(max_joltage_reg),
             .total_sum(joltage_sum)
         );
     endgenerate

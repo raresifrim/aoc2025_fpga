@@ -142,9 +142,38 @@ module CARRY8
 endmodule
 /* verilator coverage_on */
 
+/* verilator coverage_off */
+module CARRY4
+(
+    // Carry cascade input
+    input  wire       CI,
+    // 
+    input  wire       CYINIT,
+    // Carry MUX data input
+    input  wire [3:0] DI,
+    // Carry MUX select line
+    input  wire [3:0] S,
+    // Carry out of each stage of the chain
+    output wire [3:0] CO,
+    // Carry chain XOR general data out
+    output wire [3:0] O
+);
+    wire _w_CO0 = S[0] ? CI | CYINIT : DI[0];
+    wire _w_CO1 = S[1] ?      _w_CO0 : DI[1];
+    wire _w_CO2 = S[2] ?      _w_CO1 : DI[2];
+    wire _w_CO3 = S[3] ?      _w_CO2 : DI[3];
+
+    assign CO   = { _w_CO3, _w_CO2, _w_CO1, _w_CO0 };
+
+    assign O    =  S ^ { _w_CO2, _w_CO1, _w_CO0, CI | CYINIT };
+
+endmodule
+/* verilator coverage_on */
+
 //implemented 3:2 compressor inspired by https://community.element14.com/technologies/fpga-group/b/blog/posts/the-art-of-fpga-design---post-16
 module fast_adderNb#(
-    parameter W = 8
+    parameter W = 8,
+    parameter CARRY_PRIMITIVE = "CARRY4" // CARRY8 or CARRY4
     )(
         input logic clock, //always register the output
         input logic [W-1:0] A,B,C,
@@ -174,14 +203,30 @@ module fast_adderNb#(
         assign SI = {'0,O6};
         assign DI = {'0,O5};
 
-        for(i=0;i<=MSB/8;i++)
-            CARRY8 CARRY8_inst(
-                .CI(CY[i*8]),
-                .CI_TOP('0),
-                .DI(DI[8*i+7:8*i]),
-                .S(SI[8*i+7:8*i]),
-                .CO(CY[8*i+8:8*i+1]),
-                .O(O[8*i+7:8*i]));
+
+        if (CARRY_PRIMITIVE == "CARRY8") begin
+        //CARRY8 variant
+            for(i=0;i<=MSB/8;i++)
+                CARRY8 CARRY8_inst(
+                    .CI(CY[i*8]),
+                    .CI_TOP('0),
+                    .DI(DI[8*i+7:8*i]),
+                    .S(SI[8*i+7:8*i]),
+                    .CO(CY[8*i+8:8*i+1]),
+                    .O(O[8*i+7:8*i]));
+        end
+        else if(CARRY_PRIMITIVE == "CARRY4") begin
+        //CARRY4 variant
+            for(i=0;i<=MSB/4;i++) begin
+                 CARRY4 CARRY4_inst(
+                    .CI(CY[i*4]),
+                    .CYINIT('0),
+                    .DI(DI[4*i+3:4*i]),
+                    .S(SI[4*i+3:4*i]),
+                    .CO(CY[4*i+4:4*i+1]),
+                    .O(O[4*i+3:4*i]));
+            end
+        end
 
         always_ff@(posedge clock)
             P <= O;

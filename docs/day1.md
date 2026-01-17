@@ -31,9 +31,9 @@ Here we can see how, when we encounter a large number like 719, the FSM becomes 
  
  until it can process a new input. Otherwise for small inputs that don't overflow/underflow the rotation, it can process a new input each clock cycle.
 
-### Input/Output ports
+## Input/Output ports
 
-```systemverilog
+```verilog
 input logic clock,
 input logic reset,
 input logic init, //save the max_number
@@ -45,9 +45,9 @@ output logic ready, ///ready to receive a (new) input
 output logic [WIDTH-1:0] password
 ```
 
-### Parameters
+## Parameters
 
-```systemverilog
+```verilog
 parameter WIDTH=16, //width of our inputs in bits
 parameter PUZZLE = 1 //part 1 or part 2 of the puzzle
 ```

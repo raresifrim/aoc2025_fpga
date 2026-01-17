@@ -80,7 +80,7 @@ module day3_puzzle2_tb();
 
     initial begin
         $dumpfile("dump.vcd");
-        $dumpvars(0, day3_puzzle1_tb);
+        $dumpvars(0, day3_puzzle2_tb);
         forever begin
             #(CLK_PERIOD/2) clock = ~clock;
         end
